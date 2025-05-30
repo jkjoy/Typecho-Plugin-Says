@@ -1,11 +1,4 @@
 <?php
-/**
- * 说说管理
- *
- * @package Says
- * @author Your Name
- * @version 1.0.0
- */
 namespace TypechoPlugin\Says;
 
 use Typecho\Db;
@@ -14,6 +7,10 @@ use Widget\Notice;
 use Utils\Helper;
 use Typecho\Common;
 use Typecho\Db\Query;
+
+/**
+ * 说说后台管理
+ */
 
 if(!defined('__TYPECHO_ADMIN__')) exit;
 
@@ -66,6 +63,8 @@ if ($request->isPost() && $request->get('ajax') == 1) {
             $currentTime = time();
             // 获取UA
             $agent = $request->getAgent();
+            // 来源
+            $source = getSource($agent) ?? $pluginOptions->defaultSource;
             // 插入数据库
             $lastInsertId = $db->query($db->insert('table.says')->rows([
                 'uuid' => generateUUID(),
@@ -73,12 +72,12 @@ if ($request->isPost() && $request->get('ajax') == 1) {
                 'content' => $content,
                 'agent' => $agent,
                 'ip' => $request->getIp() ?? '0.0.0.0',
-                'source' => getSource($agent) ?? $pluginOptions->defaultSource,
+                'source' => $source,
                 'status' => $status,
                 'created_at' => $currentTime,
                 'updated_at' => $currentTime,
             ]));
-            $response = ['status' => 1, 'message' => '发布成功', 'id' => $lastInsertId];
+            $response = ['status' => 1, 'message' => '发布成功', 'data' => ['id' => $lastInsertId, 'source' => $source]];
         } catch (\Exception $e) {
             $response = ['status' => 0, 'message' => '发布失败: ' . $e->getMessage()];
         }
@@ -374,7 +373,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // 发布说说
     publishBtn.addEventListener('click', function() {
         const content = contentTextarea.value.trim();
-        const source = sourceInput.value.trim() || '后台';
         
         if (!content) {
             showMessage('说说内容不能为空', 'error');
@@ -390,7 +388,6 @@ document.addEventListener('DOMContentLoaded', function() {
         formData.append('ajax', 1);
         formData.append('do', 'publish');
         formData.append('content', content);
-        formData.append('source', source);
         formData.append('userId', '<?php echo $userId; ?>');
         
         // AJAX请求
@@ -410,7 +407,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // 清空输入框
                 contentTextarea.value = '';
                 // 添加到列表
-                addSayToList(data.id, content, source);
+                addSayToList(data.data.id, content, data.data.source);
             } else {
                 // 失败
                 showMessage(data.message || '发布失败', 'error');
