@@ -60,7 +60,7 @@ class Action extends Widget {
                     'updated_at' => intval($memo['updated_at']),
                     'up' => intval($memo['up']),
                     'down' => intval($memo['down']),
-                    'from' => $memo['source'] ?: ''
+                    'from' => getPlatform($memo['agent'])
                 ];
             }
             // 返回数据
@@ -122,8 +122,6 @@ class Action extends Widget {
             $content = isset($data['content']) ? trim($data['content']) : '';
             // 提取UA
             $agent = $this->request->getAgent();
-            // 如果有提交，则以提交为主，如果没有，就从ua中提取
-            $source = $data['from'] ?? getSource($agent);
             // 验证内容
             list($valid, $message) = validateSayContent($content);
             // 验证失败直接抛出错误
@@ -137,7 +135,6 @@ class Action extends Widget {
                 'content' => $content,
                 'agent' => $agent, // 直接加在ua里，把来源
                 'ip' => $this->request->getIp() ?? '0.0.0.0',
-                'source' => $source ?? $this->options->defaultSource,
                 'status' => (strtoupper($data['visibility'] ?? 'public') === 'PUBLIC') ? 1 : 0,
                 'created_at' => $currentTime,
                 'updated_at' => $currentTime

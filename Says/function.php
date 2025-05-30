@@ -110,3 +110,101 @@ function getSource($source, $rule = '') {
     // 如果没有匹配到任何规则，返回未知
     return '';
 }
+
+/**
+ * 检测用户代理字符串中的操作系统
+ * 
+ * @param string $userAgent 用户代理字符串，用于识别客户端操作系统和浏览器信息
+ * @return array 包含操作系统和浏览器信息的数组
+ */
+function getOS($userAgent = '') {
+    // 返回值
+    $result = ['os' => 'Unknown', 'browser' => 'Unknown'];
+    // 操作系统检测 - 用一个正则匹配所有可能的操作系统
+    if (preg_match('/(?:Windows NT (\d+\.\d+)|iPhone|iPad|Macintosh|Mac OS X|Android|Linux)/i', $userAgent, $osMatches)) {
+        switch (true) {
+            case isset($osMatches[1]):
+                // Windows 版本映射
+                $winVersions = ['10.0' => 'Windows 10/11', '6.3' => 'Windows 8.1', '6.2' => 'Windows 8', '6.1' => 'Windows 7', '6.0' => 'Windows Vista', '5.1' => 'Windows XP'];
+                $result['os'] = $winVersions[$osMatches[1]] ?? 'Windows';
+                break;
+            case stripos($osMatches[0], 'iPhone') !== false:
+                $result['os'] = 'iOS';
+                break;
+            case stripos($osMatches[0], 'iPad') !== false:
+                $result['os'] = 'iPadOS';
+                break;
+            case stripos($osMatches[0], 'Mac') !== false:
+                $result['os'] = 'macOS';
+                break;
+            case stripos($osMatches[0], 'Android') !== false:
+                $result['os'] = 'Android';
+                break;
+            case stripos($osMatches[0], 'Linux') !== false:
+                $result['os'] = 'Linux';
+                break;
+         }
+    }
+    return $result['os'];
+}
+
+/**
+ * 获取用户浏览器信息
+ * 通过解析用户代理字符串（User Agent）来判断用户正在使用的浏览器类型及版本
+ * 
+ * @param string $userAgent 用户代理字符串，默认为空，如果为空将使用当前请求的用户代理
+ * @return string 返回浏览器名称及版本，如果没有匹配到已知的浏览器，则返回空字符串
+ */
+function getBrowser($userAgent = '') {
+    // 浏览器检测 - 用一个正则匹配所有主流浏览器及版本
+    if (preg_match('/(Edg|Edge)\/(\d+)\.|Chrome\/(\d+)\.|Firefox\/(\d+)\.|Version\/(\d+)\..*Safari|MSIE (\d+)\.|rv:(\d+)\..*Trident/i', $userAgent, $browserMatches)) {
+        if (!empty($browserMatches[1]) && !empty($browserMatches[2])) {
+            // Edge
+            $result['browser'] = 'Microsoft Edge ' . $browserMatches[2];
+        } elseif (!empty($browserMatches[3])) {
+            // Chrome
+            $result['browser'] = 'Google Chrome ' . $browserMatches[3];
+        } elseif (!empty($browserMatches[4])) {
+            // Firefox
+            $result['browser'] = 'Mozilla Firefox ' . $browserMatches[4];
+        } elseif (!empty($browserMatches[5])) {
+            // Safari
+            $result['browser'] = 'Apple Safari ' . $browserMatches[5];
+        } elseif (!empty($browserMatches[6])) {
+            // IE (MSIE)
+            $result['browser'] = 'IE ' . $browserMatches[6];
+        } elseif (!empty($browserMatches[7])) {
+            // IE (Trident)
+            $result['browser'] = 'IE ' . $browserMatches[7];
+        }
+    }
+    return $result['browser'];
+}
+
+
+/**
+ * 根据用户代理获取平台信息
+ * 
+ * 此函数首先尝试解析用户代理以获取来源信息如果解析失败或结果为空，
+ * 则根据配置返回默认的操作系统信息、浏览器信息或自定义内容
+ * 
+ * @param string $agent 用户代理字符串，默认为空
+ * @return string 平台信息或自定义内容，如果没有配置则返回空字符串
+ */
+function getPlatform($agent = '') {
+    // 直接解析用户代理获取来源信息
+    $result = getSource($agent);
+    if (!empty($result)) return $result;
+    
+    // 获取默认来源配置
+    $defaultSource = \Utils\Helper::options()->plugin('Says')->defaultSource;
+    
+    // 根据配置处理来源信息
+    if (empty($defaultSource)) return '';
+    if ($defaultSource == '1') return getOS($agent);
+    if ($defaultSource == '2') return getBrowser($agent);
+    if ($defaultSource == '3') return getOS($agent) . ' ' . getBrowser($agent);
+    
+    // 返回自定义内容
+    return $defaultSource;
+}

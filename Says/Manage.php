@@ -63,8 +63,6 @@ if ($request->isPost() && $request->get('ajax') == 1) {
             $currentTime = time();
             // 获取UA
             $agent = $request->getAgent();
-            // 来源
-            $source = getSource($agent) ?? $pluginOptions->defaultSource;
             // 插入数据库
             $lastInsertId = $db->query($db->insert('table.says')->rows([
                 'uuid' => generateUUID(),
@@ -72,12 +70,11 @@ if ($request->isPost() && $request->get('ajax') == 1) {
                 'content' => $content,
                 'agent' => $agent,
                 'ip' => $request->getIp() ?? '0.0.0.0',
-                'source' => $source,
                 'status' => $status,
                 'created_at' => $currentTime,
                 'updated_at' => $currentTime,
             ]));
-            $response = ['status' => 1, 'message' => '发布成功', 'data' => ['id' => $lastInsertId, 'source' => $source]];
+            $response = ['status' => 1, 'message' => '发布成功', 'data' => ['id' => $lastInsertId, 'source' => getPlatform($agent)]];
         } catch (\Exception $e) {
             $response = ['status' => 0, 'message' => '发布失败: ' . $e->getMessage()];
         }
@@ -159,14 +156,12 @@ $userId = isset($pluginOptions->userId) && !empty($pluginOptions->userId) ?  $pl
                             <?php foreach ($saysList as $say): ?>
                                 <div class="typecho-list-table-row" id="say-<?php echo $say['id']; ?>">
                                     <div class="say-operation">
-                                        <a href="javascript:;" 
-                                           data-id="<?php echo $say['id']; ?>"
-                                           class="operate-delete"><?php _e('删除'); ?></a>
+                                        <a href="javascript:;" data-id="<?php echo $say['id']; ?>" class="operate-delete"><?php _e('删除'); ?></a>
                                     </div>
                                     <div class="say-content" data-raw-content="<?php echo $say['content']; ?>"></div>
                                     <div class="say-meta">
                                         <span class="say-date"><?php echo date('Y-m-d H:i:s', $say['created_at']); ?></span>
-                                        <span class="say-source"><?php _e('来源'); ?>: <?php echo getSource($say['agent']); ?></span>
+                                        <span class="say-source"><?php _e('来源'); ?>: <?php echo getPlatform($say['agent']); ?></span>
                                         <span class="say-source"><?php _e('说说ID'); ?>: <?php echo $say['id']; ?></span>
                                     </div>
                                 </div>
@@ -354,6 +349,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="say-meta">
                 <span class="say-date">${formattedDate}</span>
                 <span class="say-source">来源: ${source}</span>
+                <span class="say-source">说说ID: ${id}</span>
             </div>
         `;
         

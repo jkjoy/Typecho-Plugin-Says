@@ -18,7 +18,7 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
  * 
  * @package Says
  * @author 猫东东
- * @version 1.0.1
+ * @version 1.1.0
  * @link https://github.com/xa1st/Typecho-Plugin-Says
  */
 class Plugin implements PluginInterface {
@@ -101,7 +101,7 @@ class Plugin implements PluginInterface {
         $isOpen = new Radio(
             'isOpen', 
             ['1' => _t('打开'), '0' => _t('关闭')], 
-            0,
+            1,
             _t('是否开启API远程提交'),
             _t('如果只想后台提交说说，请关闭此选项')
         );
@@ -119,19 +119,19 @@ class Plugin implements PluginInterface {
         $platform = new Textarea(
             'platform',
             NULL,
-            _t('Chrome浏览器|Chrome'),
+            _t("绿泡泡 V\\\\1||MicroMessenger\/(.*?)\(\n全能的Windows||Windows精致的MacOS||Mac\n肾疼的IPhone||iPhone\n泡面盖子IPad||iPad\n曾经卡死的Android||Android\n真正的神Linux||Linux"),
             _t('来源名称'),
-            _t('要识别的小尾巴，格式 [浏览器名称]|[要包含的字符串]，多个小尾巴用换行分隔，例如：Chrome浏览器|Chrome/，优先级从上往下')
+            _t('要识别的小尾巴，格式 [浏览器名称]||[要包含的字符串]，多个小尾巴用换行分隔，例如：Chrome浏览器|Chrome/，优先级从上往下')
         );
         $form->addInput($platform);
 
         // 默认来源
         $defaultSource = new Text(
-            'defaultPlatform',
+            'defaultSource',
             NULL,
             '',
             _t('默认来源'),
-            _t('如果上面的都没匹配上，要显示的来源，留留空则不显示来源')
+            _t('如果所有的都没匹配到，则显示这个默认来源，可选值：直接留空:不显示来源 1:显示操作系统 2:显示浏览器 3:操作系统+浏览器，如果要显示自定义，直接 填写自定义内容')
         );
         $form->addInput($defaultSource);
     }
@@ -145,17 +145,17 @@ class Plugin implements PluginInterface {
      * 调用插件，放到指定的页面中调用即可
      * 
      */
-    public static function rander($perPage = 10, $dom = '#says', $url = '/memos/', $config = []) { 
+    public static function render($perPage = 10, $dom = '#says', $url = '/memos/', $config = []) { 
         // 获取插件URL
         $pluginUrl = Helper::options()->pluginUrl . '/Says';
         // 加载样式
-        $css = $config['css'] ?? $pluginUrl . '/css/says.css';
+        $css = $config['css'] ?? $pluginUrl . '/static/says.css';
         echo '<link rel="stylesheet" href="' . $css . '"/>';
         // 加载markdown库
-        $markdown = $config['markdown'] ?? $pluginUrl . '/marked/15.0.7/marked.min.js';
+        $markdown = $config['markdown'] ?? $pluginUrl . '/static/markd.min.js';
         echo '<script src="' . $markdown . '"></script>';
         // 加载说说用的js
-        $js = $config['js'] ?? $pluginUrl . '/static/says.min.js';
+        $js = $config['js'] ?? $pluginUrl . '/static/says.min.js?ver=' . time();
         echo '<script src="' . $js . '"></script>';
         // 创建一个MemoLoader对象
         echo '<script>const memoLoader = new MemoLoader({memos: "' . $url . '", limit: ' . $perPage . ', domId: "' . $dom . '"});</script>';
