@@ -43,7 +43,7 @@ class Plugin implements PluginInterface {
                     `id` int(11) NOT NULL AUTO_INCREMENT,
                     `user_id` int(11) NOT NULL DEFAULT 0,
                     `content` text NOT NULL,
-                    `agent` varchar(255) DEFAULT NULL,
+                    `agent` text DEFAULT NULL,
                     `created_at` int(11) NOT NULL DEFAULT 0,
                     `updated_at` int(11) NOT NULL DEFAULT 0,
                     `status` tinyint(1) NOT NULL DEFAULT 1,
