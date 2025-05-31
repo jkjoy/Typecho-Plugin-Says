@@ -18,7 +18,7 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
  * 
  * @package Says
  * @author 猫东东
- * @version 1.1.0
+ * @version 1.2.0
  * @link https://github.com/xa1st/Typecho-Plugin-Says
  */
 class Plugin implements PluginInterface {
@@ -149,7 +149,7 @@ class Plugin implements PluginInterface {
         // 获取插件URL
         $pluginUrl = Helper::options()->pluginUrl . '/Says';
         // 加载样式
-        $css = $config['css'] ?? $pluginUrl . '/static/says.css';
+        $css = $config['css'] ?? $pluginUrl . '/static/says.css?ver=' . time();
         echo '<link rel="stylesheet" href="' . $css . '"/>';
         // 加载markdown库
         $markdown = $config['markdown'] ?? $pluginUrl . '/static/markd.min.js';
@@ -158,6 +158,6 @@ class Plugin implements PluginInterface {
         $js = $config['js'] ?? $pluginUrl . '/static/says.min.js?ver=' . time();
         echo '<script src="' . $js . '"></script>';
         // 创建一个MemoLoader对象
-        echo '<script>const memoLoader = new MemoLoader({memos: "' . $url . '", limit: ' . $perPage . ', domId: "' . $dom . '"});</script>';
+        echo '<script>document.addEventListener("DOMContentLoaded", function(){ const memoLoader = new MemoLoader({memos: "' . $url . '", limit: ' . $perPage . ', domId: "' . $dom . '"});});</script>';
     }
 }
