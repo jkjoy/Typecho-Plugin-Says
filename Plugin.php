@@ -18,7 +18,7 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
  * 
  * @package Says
  * @author 猫东东
- * @version 1.2.0
+ * @version 1.2.1
  * @link https://github.com/xa1st/Typecho-Plugin-Says
  */
 class Plugin implements PluginInterface {
@@ -101,7 +101,7 @@ class Plugin implements PluginInterface {
         $isOpen = new Radio(
             'isOpen', 
             ['1' => _t('打开'), '0' => _t('关闭')], 
-            1,
+            0,
             _t('是否开启API远程提交'),
             _t('如果只想后台提交说说，请关闭此选项')
         );
