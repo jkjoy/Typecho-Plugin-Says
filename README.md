@@ -10,18 +10,23 @@ V1.2.0
 
 ## 使用方法
 
-将插件目录Says放入Typecho的插件目录即可使用
+- 下载后将文件夹改名为Says，放至 `/usr/plugins/` 目录下
 
-在要使用的页面上，添加：
+- 在后台启用插件
+
+- 在要使用的页面上，添加以下代码，即可食用
 
 ```php
 <?php \TypechoPlugin\Says\Plugin::render(10, '#says', '/memos/');?>
 ```
 10为显示条数，#says为显示的容器，/memos/为API接口地址
 
-如果你还有特殊的需求，还可以指定相关的样式和JS
+## 高级选项
+
+- 如果你还有特殊的需求，还可以指定相关的样式和JS
+
 ```php
-<?php \TypechoPlugin\Says\Plugin::render(10, '#says', '/memos/', ['css' => '', 'markdown' => '//mirrors.sustech.edu.cn/cdnjs/ajax/libs/marked/15.0.7/marked.min.js', 'js' => './says.js']);?>
+<?php \TypechoPlugin\Says\Plugin::render(10, '#says', '/memos/', ['css' => '', 'markdown' => 'https://cdnjs.cloudflare.com/ajax/libs/marked/15.0.7/marked.min.js', 'js' => './says.js']);?>
 ```
 这样配置，系统将会不加载默认样式，并加载公共的markd库和本地的JS文件
 
