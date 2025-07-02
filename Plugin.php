@@ -18,7 +18,7 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
  * 
  * @package Says
  * @author 猫东东
- * @version 1.2.1
+ * @version 1.2.2
  * @link https://github.com/xa1st/Typecho-Plugin-Says
  */
 class Plugin implements PluginInterface {
