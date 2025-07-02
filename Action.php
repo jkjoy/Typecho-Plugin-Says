@@ -58,8 +58,6 @@ class Action extends Widget {
                     'content' => $memo['content'],
                     'created_at' => intval($memo['created_at']),
                     'updated_at' => intval($memo['updated_at']),
-                    'up' => intval($memo['up']),
-                    'down' => intval($memo['down']),
                     'from' => getPlatform($memo['agent'])
                 ];
             }
